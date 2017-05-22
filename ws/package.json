@@ -1,0 +1,24 @@
+{
+  "name": "ws_benchmark",
+  "version": "0.0.1",
+  "description": "",
+  "main": "client.js",
+  "dependencies": {
+    "websocket": "^1.0.24"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/PROger4ever/requestBenchmarks.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PROger4ever/requestBenchmarks/issues"
+  },
+  "homepage": "https://github.com/PROger4ever/requestBenchmarks#readme"
+}
