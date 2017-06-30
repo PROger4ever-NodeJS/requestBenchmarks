@@ -4,20 +4,22 @@ const config = require("config");
 const MAX_CONNECTIONS = config.get("client.max_connections");
 const address = `ws://${config.get("client.connect.host")}:${config.get("client.connect.port")}`;
 
-let _connectionCount = 0;
-
-
 class Client {
   constructor() {
     this._lastErrorCount = 0;
     this._lastResponseCount = 0;
     this._socket = null;
-    this.isConnected = false;
+    this._initialize();
   }
 
   errorHandler(event, data) {
     this._lastErrorCount++;
-    //console.error(event, data);
+    //console.error(arguments);
+    if (data instanceof Error) {
+      console.error(event, `${data.message}: ${data.description.message}`);
+    } else {
+      console.error(event, data);
+    }
   }
 
   resetResponseCount() {
@@ -32,34 +34,45 @@ class Client {
     return tmpCount;
   }
 
-  connect() {
+  get isConnected() {
+    return this._socket.connected;
+  }
+
+  _initialize() {
     if (this._socket) {
       this._socket.close();
       this._socket = null;
     }
     this._socket = socketioClient.connect(address, {
       transports: ['websocket'],
-      query: 'test=true'
+      query: 'test=true',
+      autoConnect: false
     });
 
     this._socket.on("connect_error", this.errorHandler.bind(this, "connect_error"));
-    this._socket.on("connect_timeout", this.errorHandler.bind(null, "connect_timeout"));
-    //this._socket.on("reconnect_failed", errorHandler.bind(null, "reconnect_failed"));
-    //this._socket.on("connect", errorHandler.bind(null, "connect"));
-    //this._socket.on("reconnect", errorHandler.bind(null, "reconnect"));
-    //this._socket.on("reconnecting", errorHandler.bind(null, "reconnecting"));
+    //this._socket.on("connect_timeout", this.errorHandler.bind(this, "connect_timeout"));
+    //this._socket.on("disconnect", this.errorHandler.bind(this, "disconnect"));
+    //this._socket.on("reconnecting", this.errorHandler.bind(this, "reconnecting"));
+    //this._socket.on("reconnect_attempt", this.errorHandler.bind(this, "reconnect_attempt"));
+    //this._socket.on("reconnect_error", this.errorHandler.bind(this, "reconnect_error"));
+    //this._socket.on("reconnect_failed", this.errorHandler.bind(this, "reconnect_failed"));
+    //this._socket.on("ping", this.errorHandler.bind(this, "ping"));
+    //this._socket.on("pong", this.errorHandler.bind(this, "pong"));
+    //this._socket.on("connect", this.connectHandler.bind(this));
+    //this._socket.on("reconnect", this.errorHandler.bind(this, "reconnect"));
+  }
 
-    //return new Promise(resolve => setTimeout(resolve, 0));
+  connect() {
+    this._socket.open();
     return new Promise((resolve, reject) => {
       let connectHandler = () => {
-        this.isConnected = true;
         this._socket.removeListener("connect", connectHandler);
         resolve();
       };
       setTimeout(() => {
         this._socket.removeListener("connect", connectHandler);
         reject("Can't connect to server");
-      }, 500000);
+      }, 30000);
       this._socket.on("connect", connectHandler);
     })
   }
@@ -76,8 +89,17 @@ class Client {
 
 let clients = [];
 async function start() {
+  console.log("socketArrayCreating...");
+  console.time("socketArrayCreating");
   clients = createClients();
+  console.timeEnd("socketArrayCreating");
+
+  console.log("connectAll...");
+  console.time("connectAll");
   await connectAll(clients);
+  console.timeEnd("connectAll");
+
+  console.log("doRequestsAll...");
   doRequestsAll(clients);
 }
 
@@ -92,18 +114,13 @@ function createClients() {
 
 async function connectAll(clients) {
   for(let i = 0; i < clients.length; i++) {
-    let client = clients[i];
-
-    await client.connect();
-    _connectionCount++;
+    await clients[i].connect();
   }
 }
 
 function doRequestsAll(clients) {
   for(let i = 0; i < clients.length; i++) {
-    let client = clients[i];
-
-    client.do_requests();
+    clients[i].do_requests();
   }
 }
 
@@ -120,7 +137,7 @@ let statusInterval = setInterval(() => {
   let rps = lastResponseCount / leftTime * 1000;
   let eps = lastErrorCount / leftTime * 1000;
 
-  console.log(`Connections: ${connectionCount}, rps: ${rps}, eps: ${eps}`);
+  console.log(`sockets: ${clients.length}, connections: ${connectionCount}, rps: ${rps}, eps: ${eps}`);
 
   lastStatusTime = new Date();
 }, 1000);
