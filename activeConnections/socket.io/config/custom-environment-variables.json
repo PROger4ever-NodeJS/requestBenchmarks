@@ -9,10 +9,10 @@
     }
   },
   "client": {
-    "connect": {
-      "host": "CLIENT_CONNECT_HOST",
+    "connection": {
+      "host": "CLIENT_CONNECTION_HOST",
       "port": {
-        "__name": "CLIENT_CONNECT_PORT",
+        "__name": "CLIENT_CONNECTION_PORT",
         "__format": "json"
       }
     }

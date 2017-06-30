@@ -2,7 +2,7 @@ const socketioClient = require("socket.io-client");
 const config = require("config");
 
 const MAX_CONNECTIONS = config.get("client.max_connections");
-const address = `ws://${config.get("client.connect.host")}:${config.get("client.connect.port")}`;
+const address = `ws://${config.get("client.connection.host")}:${config.get("client.connection.port")}`;
 
 class Client {
   constructor() {
@@ -100,7 +100,9 @@ async function start() {
   console.timeEnd("connectAll");
 
   console.log("doRequestsAll...");
+  console.time("doRequestsAll");
   await doRequestsAll(clients);
+  console.timeEnd("doRequestsAll");
 }
 
 function createClients() {

@@ -6,7 +6,7 @@
     }
   },
   "client": {
-    "connect": {
+    "connection": {
       "host": "socket-benchmark",
       "port": 80
     },
