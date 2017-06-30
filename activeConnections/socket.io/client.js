@@ -77,7 +77,7 @@ class Client {
     })
   }
 
-  do_requests() {
+  doRequests() {
     this._socket.on("client", (res) => {
       this._lastResponseCount++;
       this._socket.emit("server", "ok");
@@ -100,7 +100,7 @@ async function start() {
   console.timeEnd("connectAll");
 
   console.log("doRequestsAll...");
-  doRequestsAll(clients);
+  await doRequestsAll(clients);
 }
 
 function createClients() {
@@ -118,9 +118,10 @@ async function connectAll(clients) {
   }
 }
 
-function doRequestsAll(clients) {
+async function doRequestsAll(clients) {
   for(let i = 0; i < clients.length; i++) {
-    clients[i].do_requests();
+    clients[i].doRequests();
+    await new Promise(resolve => setTimeout(resolve, 0));
   }
 }
 
