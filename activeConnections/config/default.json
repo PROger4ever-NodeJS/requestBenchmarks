@@ -1,0 +1,15 @@
+{
+  "server": {
+    "listen": {
+      "ip": "127.0.0.1",
+      "port": 1337
+    }
+  },
+  "client": {
+    "connect": {
+      "host": "socket-benchmark",
+      "port": 80
+    },
+    "max_connections": 700
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "server": {
+    "listen": {
+      "ip": "SERVER_LISTEN_IP",
+      "port": {
+        "__name": "SERVER_LISTEN_PORT",
+        "__format": "json"
+      }
+    }
+  },
+  "client": {
+    "connect": {
+      "host": "CLIENT_CONNECT_HOST",
+      "port": {
+        "__name": "CLIENT_CONNECT_PORT",
+        "__format": "json"
+      }
+    }
+  }
+}
